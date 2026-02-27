@@ -1,0 +1,66 @@
+#include <iostream>
+#include <fstream>
+#include <cstdlib>
+#include <ctime>
+#include <cstring>
+
+using namespace std;
+
+struct Record {
+    int id;
+    char name[20];
+    int age;
+    double salary;
+};
+
+int main() {
+    srand(time(0));
+
+    const int N = 10;
+    Record r;
+
+    ofstream out("data.bin", ios::binary);
+
+    if (!out) {
+        cout << "Error creating file\n";
+        return 1;
+    }
+
+    for (int i = 0; i < N; i++) {
+        r.id = i + 1;
+
+        strcpy(r.name, "User");
+
+        r.age = 18 + rand() % 10;
+        r.salary = 1000 + rand() % 5000;
+
+        out.write((char*)&r, sizeof(Record));
+    }
+
+    out.close();
+
+    ifstream in("data.bin", ios::binary);
+
+    if (!in) {
+        cout << "Error opening file\n";
+        return 1;
+    }
+
+    cout << "------ Data from file ------\n";
+
+    while (in.read((char*)&r, sizeof(Record))) {
+        cout << "ID: " << r.id << endl;
+        cout << "Name: " << r.name << endl;
+        cout << "Age: " << r.age << endl;
+        cout << "Salary: " << r.salary << endl;
+        cout << "---------------------------\n";
+    }
+
+    in.close();
+
+    ifstream sizeFile("data.bin", ios::binary | ios::ate);
+    cout << "\nFile size: " << sizeFile.tellg() << " bytes\n";
+    sizeFile.close();
+
+    return 0;
+}
